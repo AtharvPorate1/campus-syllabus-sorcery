@@ -2,13 +2,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, CheckCircle, Circle } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, Circle, Menu } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore, Course as CourseType } from '@/store/useStore';
 import PageTransition from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import CourseMenu from '@/components/CourseMenu';
+import { generateChapterContent } from '@/services/contentGenerator';
 
 const Course = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +18,8 @@ const Course = () => {
   const { courses, updateCourse, markChapterCompleted } = useStore();
   const [course, setCourse] = useState<CourseType | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+  const [chapterContent, setChapterContent] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
     if (id) {
@@ -36,6 +40,47 @@ const Course = () => {
       }
     }
   }, [id, courses, navigate]);
+  
+  useEffect(() => {
+    async function loadChapterContent() {
+      if (selectedChapter && course) {
+        const chapter = course.chapters?.find(c => c.id === selectedChapter);
+        if (chapter) {
+          // If content is just a placeholder (less than 100 chars), generate new content
+          if (!chapter.content || chapter.content.length < 100) {
+            setIsLoading(true);
+            try {
+              const content = await generateChapterContent(chapter.title);
+              
+              // Update chapter content in the store
+              const updatedChapters = course.chapters?.map(ch => 
+                ch.id === selectedChapter ? { ...ch, content } : ch
+              );
+              
+              if (updatedChapters) {
+                updateCourse(course.id, { 
+                  chapters: updatedChapters,
+                  updatedAt: new Date().toISOString()
+                });
+              }
+              
+              setChapterContent(content);
+            } catch (error) {
+              console.error("Failed to load chapter content:", error);
+              setChapterContent(chapter.content || "Failed to load content. Please try again.");
+            } finally {
+              setIsLoading(false);
+            }
+          } else {
+            // Use existing content
+            setChapterContent(chapter.content);
+          }
+        }
+      }
+    }
+    
+    loadChapterContent();
+  }, [selectedChapter, course, updateCourse]);
   
   const handleChapterClick = (chapterId: string) => {
     setSelectedChapter(chapterId);
@@ -77,14 +122,25 @@ const Course = () => {
   return (
     <PageTransition>
       <div className="page-content">
-        <Button
-          variant="ghost"
-          className="mb-4 p-0 h-auto hover:bg-transparent"
-          onClick={() => navigate('/dashboard')}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          <span>Back to Dashboard</span>
-        </Button>
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            className="p-0 h-auto hover:bg-transparent"
+            onClick={() => navigate('/dashboard')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span>Back to Dashboard</span>
+          </Button>
+          
+          {course.chapters && (
+            <CourseMenu 
+              chapters={course.chapters} 
+              activeChapterId={selectedChapter} 
+              onSelectChapter={handleChapterClick}
+              courseTitle={course.title}
+            />
+          )}
+        </div>
         
         <div className="bg-card rounded-lg shadow-page overflow-hidden">
           <div className="p-6 sm:p-8">
@@ -102,7 +158,7 @@ const Course = () => {
             <Separator className="my-6" />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="col-span-1 order-2 lg:order-1">
+              <div className="col-span-1 order-2 lg:order-1 hidden lg:block">
                 <h3 className="text-lg font-medium mb-4">Course Content</h3>
                 <div className="space-y-2">
                   {course.chapters?.map((chapter, index) => (
@@ -163,11 +219,20 @@ const Course = () => {
                       </Button>
                     </div>
                     
-                    <div className="prose prose-stone dark:prose-invert max-w-none">
-                      {selectedChapterContent.content.split('\n').map((paragraph, idx) => (
-                        <p key={idx}>{paragraph}</p>
-                      ))}
-                    </div>
+                    {isLoading ? (
+                      <div className="flex flex-col items-center justify-center py-12">
+                        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+                        <p className="text-muted-foreground">Generating chapter content...</p>
+                      </div>
+                    ) : (
+                      <div className="prose prose-stone dark:prose-invert max-w-none">
+                        {chapterContent ? (
+                          <div dangerouslySetInnerHTML={{ __html: chapterContent.replace(/\n/g, '<br/>') }} />
+                        ) : (
+                          <p>No content available for this chapter.</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-64 bg-accent/30 rounded-md">

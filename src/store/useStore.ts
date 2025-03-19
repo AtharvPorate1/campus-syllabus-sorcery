@@ -38,6 +38,7 @@ interface StoreState {
   setSyllabus: (syllabus: StoreState['syllabus']) => void;
   markChapterCompleted: (courseId: string, chapterId: string, completed: boolean) => void;
   updateCourseStatus: (courseId: string, status: CourseStatus) => void;
+  updateChapterContent: (courseId: string, chapterId: string, content: string) => void;
 }
 
 // Create some sample courses for testing
@@ -145,6 +146,25 @@ export const useStore = create<StoreState>()(
             : course
         )
       })),
+
+      updateChapterContent: (courseId, chapterId, content) => set((state) => {
+        const updatedCourses = state.courses.map(course => {
+          if (course.id === courseId && course.chapters) {
+            const updatedChapters = course.chapters.map(chapter => 
+              chapter.id === chapterId ? { ...chapter, content } : chapter
+            );
+            
+            return {
+              ...course,
+              chapters: updatedChapters,
+              updatedAt: new Date().toISOString()
+            };
+          }
+          return course;
+        });
+        
+        return { courses: updatedCourses };
+      }),
     }),
     {
       name: 'acampus-storage',

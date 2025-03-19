@@ -1,11 +1,9 @@
-
 import { toast } from "sonner";
 
 const API_URL = 'https://api.openai.com/v1/chat/completions';
 
-// In a real app, you should use environment variables for this
-// This is just for demonstration purposes
-let OPENAI_API_KEY = '';
+// Default API key (can be overridden by users)
+let OPENAI_API_KEY = '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';
 
 export const setOpenAIKey = (key: string) => {
   OPENAI_API_KEY = key;
@@ -14,7 +12,7 @@ export const setOpenAIKey = (key: string) => {
 
 export const getOpenAIKey = () => {
   if (!OPENAI_API_KEY) {
-    OPENAI_API_KEY = localStorage.getItem('openai_key') || '';
+    OPENAI_API_KEY = localStorage.getItem('openai_key') || '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';
   }
   return OPENAI_API_KEY;
 };

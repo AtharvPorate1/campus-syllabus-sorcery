@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, BookOpen, Sparkles } from 'lucide-react';
@@ -9,7 +8,6 @@ import CourseCard from '@/components/CourseCard';
 import EmptyState from '@/components/EmptyState';
 import PageTransition from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
-import { getOpenAIKey } from '@/services/openai';
 
 const Classroom = () => {
   const [searchInput, setSearchInput] = useState('');
@@ -21,12 +19,6 @@ const Classroom = () => {
     e.preventDefault();
     if (!searchInput.trim()) {
       toast.error('Please enter a topic to search');
-      return;
-    }
-    
-    const apiKey = getOpenAIKey();
-    if (!apiKey) {
-      toast.error('Please set your OpenAI API key first');
       return;
     }
     

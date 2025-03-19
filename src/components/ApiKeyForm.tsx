@@ -2,13 +2,14 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Key } from 'lucide-react';
+import { Key, Check } from 'lucide-react';
 import { setOpenAIKey, getOpenAIKey } from '@/services/openai';
 import { toast } from 'sonner';
 
 const ApiKeyForm = () => {
   const [apiKey, setApiKey] = useState(getOpenAIKey() || '');
   const [open, setOpen] = useState(false);
+  const hasDefaultKey = apiKey === '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';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,18 +26,18 @@ const ApiKeyForm = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
-          <Key className="h-4 w-4" />
+          {hasDefaultKey ? <Check className="h-4 w-4 text-green-500" /> : <Key className="h-4 w-4" />}
           <span>API Key</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Set OpenAI API Key</DialogTitle>
+          <DialogTitle>OpenAI API Key</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col space-y-2">
             <label htmlFor="apiKey" className="text-sm font-medium">
-              Enter your OpenAI API key to enable AI features
+              {hasDefaultKey ? "A default API key is provided. You can use your own key instead:" : "Enter your OpenAI API key to enable AI features:"}
             </label>
             <input
               id="apiKey"
@@ -48,7 +49,9 @@ const ApiKeyForm = () => {
               required
             />
             <p className="text-xs text-muted-foreground">
-              Your API key is stored only in your browser's local storage and never sent to our servers.
+              {hasDefaultKey 
+                ? "The default key is provided for demonstration purposes. For production use, use your own key."
+                : "Your API key is stored only in your browser's local storage and never sent to our servers."}
             </p>
           </div>
           <div className="flex justify-end">

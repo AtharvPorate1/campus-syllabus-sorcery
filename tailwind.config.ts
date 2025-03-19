@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,15 +53,15 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				page: {
+					light: 'hsl(var(--page-light))',
+					cream: 'hsl(var(--page-cream))',
+					edge: 'hsl(var(--page-edge))'
+				},
+				book: {
+					spine: 'hsl(var(--book-spine))',
+					cover: 'hsl(var(--book-cover))',
+					title: 'hsl(var(--book-title))'
 				}
 			},
 			borderRadius: {
@@ -68,27 +69,49 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				serif: ['Garamond', 'Baskerville', 'Georgia', 'Times New Roman', 'serif'],
+				sans: ['Inter', 'system-ui', 'sans-serif'],
+				display: ['Playfair Display', 'serif'],
+			},
+			boxShadow: {
+				'book': '0 10px 30px -10px rgba(0, 0, 0, 0.1), 2px 0 10px -5px rgba(0, 0, 0, 0.05)',
+				'page': '0 3px 10px rgba(0, 0, 0, 0.08)',
+				'hover': '0 10px 40px -15px rgba(0, 0, 0, 0.15), 2px 0 15px -5px rgba(0, 0, 0, 0.1)',
+			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
+				},
+				'page-turn': {
+					'0%': { transform: 'rotateY(0deg)', transformOrigin: 'left' },
+					'100%': { transform: 'rotateY(-180deg)', transformOrigin: 'left' }
+				},
+				'page-turn-reverse': {
+					'0%': { transform: 'rotateY(-180deg)', transformOrigin: 'left' },
+					'100%': { transform: 'rotateY(0deg)', transformOrigin: 'left' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'page-turn': 'page-turn 0.8s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards',
+				'page-turn-reverse': 'page-turn-reverse 0.8s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards',
+				'fade-in': 'fade-in 0.6s ease-in-out',
+				'float': 'float 3s ease-in-out infinite'
 			}
 		}
 	},

@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 const API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -66,9 +67,13 @@ export const generateSyllabus = async (topic: string): Promise<SyllabusChapter[]
     const data = await response.json();
     const content = data.choices[0].message.content;
     
-    // Parse the JSON response
+    // Parse the JSON response, handling both raw JSON and markdown-wrapped JSON
     try {
-      const syllabusContent = JSON.parse(content);
+      // Clean the response: Remove markdown code blocks if present
+      const cleanedContent = content.replace(/```json\n|\n```|```/g, '');
+      console.log("Cleaned content for parsing:", cleanedContent);
+      
+      const syllabusContent = JSON.parse(cleanedContent);
       if (Array.isArray(syllabusContent)) {
         return syllabusContent;
       } else {

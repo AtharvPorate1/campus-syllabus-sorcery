@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -50,7 +49,7 @@ const Course = () => {
           if (!chapter.content || chapter.content.length < 100) {
             setIsLoading(true);
             try {
-              const content = await generateChapterContent(chapter.title);
+              const content = await generateChapterContent(chapter.title, chapter.content || "");
               
               // Update chapter content in the store
               const updatedChapters = course.chapters?.map(ch => 
